@@ -2,6 +2,7 @@
 1.	Установить MySQL
 2.	Установить MySQLWorkbench
 3.	Создать подключение
+4.  В web_application.web_application.__init__.py прописать логин и пароль
 4.	Создать схему training_plan
 5.	Запустить manage.py 
 6.	manage.py makemigrations

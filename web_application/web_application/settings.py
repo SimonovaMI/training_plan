@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from web_application import mysql_user, mysql_password
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -79,8 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'training_plan',
-        'USER': 'root',
-        'PASSWORD': '@30041992Omi177',
+        'USER': mysql_user,
+        'PASSWORD': mysql_password,
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
