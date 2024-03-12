@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Планируемые посещения</h2>
+    <form action="{% url 'client_plan' %}" method="post">
+        <p>
+           {% csrf_token %}
+            {{ date.as_p }}
+           <button type="submit">Посмотреть</button>
+        </p>
+    </form>
+{% endblock %}

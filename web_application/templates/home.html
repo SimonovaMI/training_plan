@@ -1,7 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Добрый день, пользователь!</h2>
+  <h2>Добрый день, {{ user.get_username }}!</h2>
     <p>Хотите посмотреть загруженнось зала?</p>
-    <p>Выберите интересующую Вас дату:</p>
+    <form action="{% url 'plan' %}" method="post">
+        <p>Выберите интересующую Вас дату:</p>
+        <p>
+            <label for="date">Дата: </label>
+            <input type="date" id="date" name="date"/>
+        </p>
+        <p>Выберите фитнес-клуб:</p>
+        <p>
+            <label for="select">Дата: </label>
+            <select name="fitness_club"> 
+               {% for club in clubs %}
+                   <option value="{{ club.club_id }}">{{ club }}</option>
+               {% endfor %}
+            </select>
+        </p>
+        <p>
+           {% csrf_token %}
+           <button type="submit">Посмотреть</button>
+        </p>
+    </form>
 {% endblock %}
