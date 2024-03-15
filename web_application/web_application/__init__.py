@@ -1,5 +1,5 @@
-mysql_user = ''
-mysql_password = ''
+mysql_user = 'user'
+mysql_password = 'password'
 
 
 
