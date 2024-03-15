@@ -98,7 +98,7 @@ class Schedule(models.Model):
     start = models.DateTimeField(help_text='Enter the start')
     end = models.DateTimeField(help_text='Enter the end')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, help_text='Enter the group of the schedule')
-    zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
+    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
                                                                                       'schedule')
     comment = models.CharField(max_length=150, blank=True, null=True, help_text='Enter a comfortable number '

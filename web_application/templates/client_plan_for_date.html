@@ -18,7 +18,8 @@
        <p>
            
            {% csrf_token %}
-           <input type="hidden" value={{x.plan_id}} id="plan_ident" name = "plan_ident"/>  
+           <input type="hidden" value={{x.plan_id}} id="plan_ident" name = "plan_ident"/> 
+           <input type="hidden" value={{x.is_group}} id="is_group" name = "is_group"/>
            <button type="submit">Удалить</button>
         </p>
             </form>
