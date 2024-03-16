@@ -9,8 +9,8 @@ from . import forms
 # Create your views here.
 @login_required
 def home(request):
-    clubs = FitnessClub.objects.all()
-    return render(request, 'home.html', {'clubs': clubs})
+    date_plan = forms.PlanDate()
+    return render(request, 'home.html', {'date': date_plan})
 
 
 def plan(request):
@@ -18,7 +18,7 @@ def plan(request):
 
 
 def client_plan(request):
-    date_client_plan = forms.ClientPlan()
+    date_client_plan = forms.PlanDate()
     # if request.method == 'POST':
     #     client_id = request.user.id
     #     client_plan_query = Plan.objects.filter(client=client_id)
@@ -44,10 +44,6 @@ def client_plan_for_date(request):
         else:
             return render(request, 'client_plan_for_date.html', {'date': day})
 
-
-
-
-
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -56,3 +52,22 @@ def client_plan_delete(request):
     plan_obj = Plan.objects.get(plan_id=plan_id_req)
     plan_obj.delete()
     return render(request, 'client_plan_delete.html')
+
+
+def plans_for_date_club_zone(request):
+    user = request.user
+    user_info = user.useradditionalinfo
+    cards = list(user_info.club_cards.all())
+    print(cards)
+    clubs = []
+    zones = []
+    for card in cards:
+        card_clubs = card.fitness_club.values()
+        clubs += card_clubs
+    clubs_id = [club['club_id'] for club in clubs]
+    club_zones = ClubZone.objects.all()
+    for club in clubs_id:
+        zones += club_zones.filter(fitness_club=club)
+
+    clubs = [club['tittle'] for club in clubs]
+    return render(request, 'plans_for_date_club_zone.html', {'clubs': clubs, 'zones': zones})

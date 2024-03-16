@@ -16,7 +16,7 @@ class FitnessClub(models.Model):
     email = models.CharField(max_length=50, blank=True, null=True, help_text='Enter the email of the fitness club in '
                                                                              'form like this address@mail.ru')
     date_created = models.DateField(auto_now_add=True, help_text='Enter the date the fitness club was opened')
-    date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the fitness club was closed',)
+    date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the fitness club was closed', )
 
     def __str__(self):
         return f'{self.tittle} - {self.address}'
@@ -93,10 +93,55 @@ class Group(models.Model):
         return f'{self.tittle}'
 
 
+class TimeSlot(models.Model):
+    time_slot_id = models.AutoField(primary_key=True)
+    start = models.TimeField()
+    end = models.TimeField()
+
+    class Meta:
+        managed = True
+        db_table = 'time_slots'
+        unique_together = ('start', 'end')
+
+    def __str__(self):
+        return f'{self.start} - {self.end}'
+
+
+class DayType(models.Model):
+    day_type_id = models.AutoField(primary_key=True)
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
+    DAY_TYPE_TITTLES = [('work_day', 'будни'), ('weekend', 'выходной'), ('holiday', 'праздник'), ('special_day',
+                                                                                                  'предпраздничный день')]
+    day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, unique=True)
+    time_slots = models.ManyToManyField(TimeSlot)
+
+    class Meta:
+        managed = True
+        db_table = 'day_type'
+
+    def __str__(self):
+        return f'{self.fitness_club} - {self.day_type_tittle}'
+
+
+class SpecialDay(models.Model):
+    special_day_id = models.AutoField(primary_key=True)
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
+    day = models.DateField()
+    type_of_day = models.ForeignKey(DayType, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True
+        db_table = 'special_days'
+        unique_together = ('fitness_club', 'day')
+
+    def __str__(self):
+        return f'{self.fitness_club} - {self.day}'
+
+
 class Schedule(models.Model):
     schedule_id = models.AutoField(primary_key=True)
-    start = models.DateTimeField(help_text='Enter the start')
-    end = models.DateTimeField(help_text='Enter the end')
+    day = models.DateField()
+    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, help_text='Enter the group of the schedule')
     zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
@@ -109,30 +154,30 @@ class Schedule(models.Model):
     class Meta:
         managed = True
         db_table = 'schedule'
-        ordering = ['start', 'group']
-        unique_together = ('group', 'start', 'end')
+        ordering = ['day', 'time_slot', 'group']
+        unique_together = ('group', 'time_slot', 'day')
 
     def __str__(self):
-        start_schedule = str(self.start)[:16]
+        start_schedule = f'{self.day} - {self.time_slot.start}'
         return f'{self.group} - {start_schedule}'
 
 
 class Plan(models.Model):
     plan_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    day = models.DateField()
+    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
     club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE)
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
 
     class Meta:
         managed = True
         db_table = 'plan'
-        unique_together = ('client', 'club_zone', 'start', 'end')
-        ordering = ('client', 'start')
+        unique_together = ('client', 'club_zone', 'day', 'time_slot')
+        ordering = ('client', 'day', 'time_slot')
 
     def __str__(self):
-        start_training = str(self.start)[:16]
+        start_training = f'{self.day} - {self.time_slot.start}'
         return f'{self.client} - {self.club_zone} - {start_training}'
 
 

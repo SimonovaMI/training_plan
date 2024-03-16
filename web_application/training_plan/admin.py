@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import FitnessClub, ClubZone, ClubCard, UserAdditionalInfo, Group, Schedule, Plan, PlanGroup
+from .models import (FitnessClub, ClubZone, ClubCard, UserAdditionalInfo, Group, Schedule, Plan, PlanGroup, TimeSlot,
+                     DayType, SpecialDay)
+
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
@@ -22,4 +24,7 @@ admin.site.register(Group)
 admin.site.register(Schedule)
 admin.site.register(Plan)
 admin.site.register(PlanGroup)
+admin.site.register(TimeSlot)
+admin.site.register(DayType)
+admin.site.register(SpecialDay)
 

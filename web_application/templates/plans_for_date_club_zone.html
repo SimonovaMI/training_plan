@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="{% url 'plan' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" value={{date}} id="plan_date" name = "plan_date"/>
+        <p>Выберите фитнес-клуб:</p>
+        <p>
+            <label for="select">Фитнес-клуб: </label>
+            <select name="fitness_club"> 
+               {% for club in clubs %}
+                   <option value="{{ club }}">{{ club }}</option>
+               {% endfor %}
+            </select>
+        </p>
+        <p>
+        <p>Выберите фитнес-зону:</p>
+            <label for="select">Фитнес-зону: </label>
+            <select name="fitness_zone"> 
+               {% for zone in zones %}
+                   <option value="{{ zone }}">{{ zone }}</option>
+               {% endfor %}
+            </select>
+        </p> 
+        <p>
+           
+           <button type="submit">Посмотреть</button>
+        </p>
+    </form>
+{% endblock %}
