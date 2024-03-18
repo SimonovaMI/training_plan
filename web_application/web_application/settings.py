@@ -17,7 +17,6 @@ from web_application import mysql_user, mysql_password
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-^)i4@@=5v-(v6p-4qd+uv%wrg_5y@#($!1cyv29w(em7mrjxuo
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'web_application.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -95,7 +92,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -114,7 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -125,8 +120,6 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -148,7 +141,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_PORT = 25
 # EMAIL_USE_SSL = True
 
-DATE_FORMAT = ( ( 'd-m-Y' ))
-DATE_INPUT_FORMATS = ( ('%d-%m-%Y'),)
-DATETIME_FORMAT = (( 'd-m-Y H:i' ))
-DATETIME_INPUT_FORMATS = (('%d-%m-%Y %H:%i'),)
+DATE_FORMAT = '%d-%m-%Y'
+DATE_INPUT_FORMATS = '%d-%m-%Y'
+DATETIME_FORMAT = '%d-%m-%Y %H:%M'
+DATETIME_INPUT_FORMATS = '%d-%m-%Y %H:%M'
+TIME_FORMAT = '%H:%M'
+TIME_INPUT_FORMATS = '%H:%M'

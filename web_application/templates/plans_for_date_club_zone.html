@@ -3,7 +3,7 @@
 {% block content %}
     <form action="{% url 'plan' %}" method="post">
         {% csrf_token %}
-        <input type="hidden" value={{date}} id="plan_date" name = "plan_date"/>
+        <input type="hidden" value={{day}} id="plan_date" name = "plan_date"/>
         <p>Выберите фитнес-клуб:</p>
         <p>
             <label for="select">Фитнес-клуб: </label>

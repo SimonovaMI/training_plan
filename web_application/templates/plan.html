@@ -1,22 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Планируемые посещения</h2>
+  <h2>Планируемые посещения на {{day}}</h2>
+    {% if message  %}
+    <p>{{ message }}</p>
+        {% else %}
     <table border='1'>
-  <tr><th>Время</th><th>Кол-во планирующих </th><th>Зона</th><th>Фитнес-клуб</th><th>Действие</th></tr>
+  <tr><th>Начало</th><th>Конец</th><th>Кол-во клиентов</th><th>Записаться</th></tr>
     
-        {% for x in client_plan %}
+        {% for x in time_slots_for_day %}
        <tr>    
-      <td>{{ x.start_date_time }}</td><td>{{ x.end_date_time }}</td><td>{{ x.zone }}</td><td>{{ x.fitness_club }}</td>
+      <td>{{ x.start }}</td><td>{{ x.end }}</td><td>{{ x.clients_count }}</td>
              <td>
            
-            <form action="{% url 'client_plan_delete' %}" method="post">
+            <form action="{% url 'plan_add' %}" method="post">
                
        <p>
            
            {% csrf_token %}
-           <input type="hidden" value={{x.plan_id}} id="plan_ident" name = "plan_ident"/>  
-           <button type="submit">Удалить</button>
+           <input type="hidden" value={{day}} id="date" name = "date"/>
+           <input type="hidden" value={{zone}} id="zone" name = "zone"/>
+           <input type="hidden" value={{fitness_club}} id="fitness_club" name = "fitness_club"/>
+           <input type="hidden" value={{x.time_slot_id}} id="time_slot_id" name = "time_slot_id"/> 
+           
+           <button type="submit">Запись</button>
         </p>
             </form>
            </td>>
@@ -24,6 +31,6 @@
             
         {% endfor %}
     </table>
-
+{% endif %}
     
 {% endblock %}

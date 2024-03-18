@@ -15,8 +15,9 @@ class FitnessClub(models.Model):
                                                                                     '+79991112233')
     email = models.CharField(max_length=50, blank=True, null=True, help_text='Enter the email of the fitness club in '
                                                                              'form like this address@mail.ru')
-    date_created = models.DateField(auto_now_add=True, help_text='Enter the date the fitness club was opened')
+    date_created = models.DateField(help_text='Enter the date the fitness club was opened')
     date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the fitness club was closed', )
+    comment = models.TextField(help_text='Enter information about the fitness club, zones', blank=True, null=True)
 
     def __str__(self):
         return f'{self.tittle} - {self.address}'
@@ -33,7 +34,7 @@ class ClubZone(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the description of '
                                                                                     'the fitness zone')
     fitness_club = models.ManyToManyField(FitnessClub, help_text='Choose the fitness clubs')
-    date_created = models.DateField(auto_now_add=True, help_text='Enter the date the zone of the fitness club '
+    date_created = models.DateField(help_text='Enter the date the zone of the fitness club '
                                                                  'was opened')
     date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the zone  the fitness club'
                                                                         ' was closed')
@@ -53,8 +54,7 @@ class ClubCard(models.Model):
     fitness_club = models.ManyToManyField(FitnessClub, help_text='Choose the fitness clubs')
     description = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the description of the card')
     date_of_registration = models.DateField(help_text='Enter the date of registration of the card')
-    date_of_termination = models.DateField(null=True, blank=True,
-                                           help_text='Enter the date of termination of the card')
+    date_of_termination = models.DateField(help_text='Enter the date of termination of the card')
     date_added = models.DateField(auto_now_add=True, help_text='Enter the date the entry was added')
 
     def __str__(self):
@@ -102,6 +102,7 @@ class TimeSlot(models.Model):
         managed = True
         db_table = 'time_slots'
         unique_together = ('start', 'end')
+        ordering = ['start']
 
     def __str__(self):
         return f'{self.start} - {self.end}'
@@ -113,11 +114,13 @@ class DayType(models.Model):
     DAY_TYPE_TITTLES = [('work_day', 'будни'), ('weekend', 'выходной'), ('holiday', 'праздник'), ('special_day',
                                                                                                   'предпраздничный день')]
     day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, unique=True)
-    time_slots = models.ManyToManyField(TimeSlot)
+    time_slots = models.ManyToManyField(TimeSlot, blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = 'day_type'
+        ordering = ['day_type_tittle']
+
 
     def __str__(self):
         return f'{self.fitness_club} - {self.day_type_tittle}'
@@ -133,6 +136,8 @@ class SpecialDay(models.Model):
         managed = True
         db_table = 'special_days'
         unique_together = ('fitness_club', 'day')
+        ordering = ['day']
+
 
     def __str__(self):
         return f'{self.fitness_club} - {self.day}'
