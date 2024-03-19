@@ -31,6 +31,7 @@ def plan(request):
 
     fitness_club = request.POST.get('fitness_club')
     fitness_club_db = FitnessClub.objects.get(tittle=fitness_club)
+    comment = fitness_club_db.comment
     if fitness_club_db.date_terminated is None:
         if fitness_club_db.date_created > day_date:
             message += 'Фитнес-клуб в выбранную дату закрыт. '
@@ -68,25 +69,40 @@ def plan(request):
             time_slots_for_day = DayType.objects.filter(day_type_tittle='work_day').first().time_slots.values()
     clients_count = 0
     clients_data_list = []
-    if not is_group_zone:
-        for time_slot in time_slots_for_day:
-            time_slot['start'] = time_slot['start'].strftime("%H:%M")
-            time_slot['end'] = time_slot['end'].strftime("%H:%M")
-            clients_count = 0
-            clients_data_list = []
-            clients = Plan.objects.filter(day=day_date, time_slot=time_slot['time_slot_id'],
-                                          club_zone=fitness_zone_db.zone_id).values()
-            clients_count += len(clients)
-            time_slot['clients_count'] = clients_count
-            for client in clients:
-                clients_data = {'name': User.objects.get(id=client['client_id']).get_full_name(),
-                                'phone': UserAdditionalInfo.objects.get(user=client['client_id']).phone_number}
-                clients_data_list.append(clients_data)
+    for time_slot in time_slots_for_day:
+        time_slot['start'] = time_slot['start'].strftime("%H:%M")
+        time_slot['end'] = time_slot['end'].strftime("%H:%M")
+        clients_count = 0
+        clients_data_list = []
+        clients = []
+        if not is_group_zone:
+            clients = (Plan.objects.filter(day=day_date, time_slot=time_slot['time_slot_id'],
+                                           club_zone=fitness_zone_db.zone_id, fitness_club=fitness_club_db.club_id)
+                       .values())
+        else:
+            schedule = Schedule.objects.filter(day=day_date, time_slot=time_slot['time_slot_id'],
+                                               club_zone_id=fitness_zone_db.zone_id,
+                                               fitness_club_id=fitness_club_db.club_id).first()
+
+            if schedule:
+                time_slot['schedule'] = schedule.schedule_id
+                group = Group.objects.get(schedule=schedule)
+                time_slot['group'] = group.tittle
+                time_slot['group_status'] = schedule.group_status
+                time_slot['comment'] = schedule.comment
+                clients = PlanGroup.objects.filter(schedule=schedule).values()
+
+        clients_count += len(clients)
+        time_slot['clients_count'] = clients_count
+        for client in clients:
+            clients_data = {'name': User.objects.get(id=client['client_id']).get_full_name(),
+                            'phone': UserAdditionalInfo.objects.get(user=client['client_id']).phone_number}
+            clients_data_list.append(clients_data)
             time_slot['clients_data'] = clients_data_list
 
     return render(request, 'plan.html', {'day': day, 'is_group_zone': is_group_zone,
                                          'time_slots_for_day': time_slots_for_day, 'zone': fitness_zone_db.zone_id,
-                                         'fitness_club': fitness_club_db.club_id})
+                                         'fitness_club': fitness_club_db.club_id, 'comment': comment})
 
 
 def client_plan(request):
@@ -160,16 +176,32 @@ def plans_for_date_club_zone(request):
 
 def plan_add(request):
     if request.method == "POST":
-        plan = Plan()
-        plan.client = User.objects.get(id=request.user.id)
-        plan.day = request.POST.get('date')
-        plan.time_slot = TimeSlot.objects.get(time_slot_id=request.POST.get('time_slot_id'))
-        plan.fitness_club = FitnessClub.objects.get(club_id=request.POST.get('fitness_club'))
-        plan.club_zone = ClubZone.objects.get(zone_id=request.POST.get('zone'))
-        try:
-            plan.save()
-        except IntegrityError as e:
-            return render(request, 'plan_add.html', {'message': 'Вы уже записаны на этот слот.'
-                                                                ' Пожалуйста, проверьте Ваши планируемые посещения.'})
+        if request.POST.get('is_group_zone'):
+            plan_group = PlanGroup()
+            plan_group.client = User.objects.get(id=request.user.id)
+            plan_group.schedule = Schedule.objects.get(schedule_id=request.POST.get('schedule'))
+            try:
+                plan_group.save()
+            except IntegrityError as e:
+                return render(request, 'plan_add.html', {'message': 'Вы уже записаны на этот слот.'
+                                                                    ' Пожалуйста, проверьте Ваши планируемые посещения.'})
+        else:
+            plan = Plan()
+            plan.client = User.objects.get(id=request.user.id)
+            plan.day = request.POST.get('date')
+            plan.time_slot = TimeSlot.objects.get(time_slot_id=request.POST.get('time_slot_id'))
+            plan.fitness_club = FitnessClub.objects.get(club_id=request.POST.get('fitness_club'))
+            plan.club_zone = ClubZone.objects.get(zone_id=request.POST.get('zone'))
+            try:
+                plan.save()
+            except IntegrityError as e:
+                return render(request, 'plan_add.html', {'message': 'Вы уже записаны на этот слот.'
+                                                                    ' Пожалуйста, проверьте Ваши планируемые посещения.'})
 
     return render(request, 'plan_add.html', {'message': 'Запись успешно добавлена. '})
+
+
+def plan_info(request):
+    clients_data = request.POST.get('clients_data')
+    print(clients_data)
+    return render(request, 'plan_info.html')
