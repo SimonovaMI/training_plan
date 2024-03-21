@@ -35,7 +35,7 @@ class ClubZone(models.Model):
                                                                                     'the fitness zone')
     fitness_club = models.ManyToManyField(FitnessClub, help_text='Choose the fitness clubs')
     date_created = models.DateField(help_text='Enter the date the zone of the fitness club '
-                                                                 'was opened')
+                                              'was opened')
     date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the zone  the fitness club'
                                                                         ' was closed')
 
@@ -121,7 +121,6 @@ class DayType(models.Model):
         db_table = 'day_type'
         ordering = ['day_type_tittle']
 
-
     def __str__(self):
         return f'{self.fitness_club} - {self.day_type_tittle}'
 
@@ -138,7 +137,6 @@ class SpecialDay(models.Model):
         unique_together = ('fitness_club', 'day')
         ordering = ['day']
 
-
     def __str__(self):
         return f'{self.fitness_club} - {self.day}'
 
@@ -148,12 +146,13 @@ class Schedule(models.Model):
     day = models.DateField()
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, help_text='Enter the group of the schedule')
-    club_zone_id = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
-    fitness_club_id = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
-                                                                                      'schedule')
+    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
+                                                                                         'schedule')
     comment = models.CharField(max_length=150, blank=True, null=True, help_text='Enter a comfortable number '
                                                                                 'of visitors, trainers name')
-    GROUP_STATUS = [('canceled', 'отменено'), ('planned', 'планируется')]
+   # GROUP_STATUS = [('canceled', 'отменено'), ('planned', 'планируется')]
+    GROUP_STATUS = {'canceled': 'отменено', 'planned': 'планируется'}
     group_status = models.CharField(max_length=8, choices=GROUP_STATUS, default='planned')
 
     class Meta:

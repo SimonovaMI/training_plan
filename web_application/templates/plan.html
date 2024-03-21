@@ -1,95 +1,110 @@
 {% extends "base.html" %}
-
 {% block content %}
+    {% if comment %}
     <h2 style="color: #ba2121">{{ comment }}</h2>
-    {% if time_slots_for_day %}
-  <h2>Планируемые посещения на {{day}}</h2>
-    {% if message  %}
-    <p>{{ message }}</p>
-        {% else %}
-        {% if not is_group_zone %}
-    <table border='1'>
-  <tr><th>Начало</th><th>Конец</th><th>Кол-во клиентов</th><th>Записаться</th></tr>
-    
-        {% for x in time_slots_for_day %}
-       <tr>    
-      <td>{{ x.start }}</td><td>{{ x.end }}</td><td>{{ x.clients_count }}</td>
-             <td>
-           
-            <form action="{% url 'plan_add' %}" method="post">
-               
-       <p>
-           
-           {% csrf_token %}
-           <input type="hidden" value={{is_group_zone}} id="is_group_zone" name = "is_group_zone"/>
-           <input type="hidden" value={{day}} id="date" name = "date"/>
-           <input type="hidden" value={{zone}} id="zone" name = "zone"/>
-           <input type="hidden" value={{fitness_club}} id="fitness_club" name = "fitness_club"/>
-           <input type="hidden" value={{x.time_slot_id}} id="time_slot_id" name = "time_slot_id"/> 
-           
-           <button type="submit">Запись</button>
-           
-        </p>
-            </form>
-             <form action="{% url 'plan_info' %}" method="post">>
-             
-             {% if user.is_staff %}
-                  {% csrf_token %}
-               <input type="hidden" value={{x.clients_data}} id="clients_data" name = "clients_data"/> 
-               <button type="submit">Показать</button>
-           {% endif %}
-             </form>>
-           </td>
-       </tr>
-            
-        {% endfor %}
-    </table>
-            {% else %}
-             <table border='1'>
-  <tr><th>Начало</th><th>Конец</th><th>Занятие</th><th>Статус</th><th>Комментарий</th><th>Кол-во клиентов</th><th>Записаться</th></tr>
-      {% for x in time_slots_for_day %}
-       <tr>
-       
-            
-          
-      <td>{{ x.start }}</td><td>{{ x.end }}</td><td>{{ x.group }}</td><td>{{ x.group_status }}</td><td>{{ x.comment }}</td>
-            {% if x.group %}
-            <td>{{ x.clients_count }}</td>
-             <td>
-           
-            <form action="{% url 'plan_add' %}" method="post">
-               
-       <p>
-           
-           {% csrf_token %}
-           <input type="hidden" value={{is_group_zone}} id="is_group_zone" name = "is_group_zone"/>
-           <input type="hidden" value={{x.schedule}} id="schedule" name = "schedule"/> 
-           
-           <button type="submit">Запись</button>
-        </p>
-            </form>
-             <form action="{% url 'plan_info' %}" method="post">>
-             
-             {% if user.is_staff %}
-                  {% csrf_token %}
-               <input type="hidden" value={{x.clients_data}} id="clients_data" name = "clients_data"/> 
-               <button type="submit">Показать</button>
-           {% endif %}
-             </form>>
-           </td>
-              {% else %} 
-                <td></td>
-                <td></td>>
-       {% endif %}
-       </tr>
-            
-        {% endfor %}
-    </table>
-            {% endif %}
-            
-{% endif %}
-    {% else %}
-    <h2>Сегодня клуб не работает!</h2>
     {% endif %}
-    
+    {% if time_slots_for_day %}
+        <h2>Планируемые посещения на {{ day }}</h2>
+        {% if message %}
+            <h3>{{ message }}</h3>
+        {% else %}
+            {% if not is_group_zone %}
+                <table border='1'>
+                    <tr>
+                        <th>Начало</th>
+                        <th>Конец</th>
+                        <th>Кол-во клиентов</th>
+                        <th>Записаться</th>
+                    </tr>
+                    {% for x in time_slots_for_day %}
+                        <tr>
+                            <td>{{ x.start }}</td>
+                            <td>{{ x.end }}</td>
+                            <td>{{ x.clients_count }}</td>
+                            <td>
+                                <form action="{% url 'plan_add' %}" method="post">
+                                    <p>
+                                        {% csrf_token %}
+                                        <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
+                                               name="is_group_zone"/>
+                                        <input type="hidden" value={{ day }} id="date" name="date"/>
+                                        <input type="hidden" value={{ zone }} id="zone" name="zone"/>
+                                        <input type="hidden" value={{ fitness_club }} id="fitness_club"
+                                               name="fitness_club"/>
+                                        <input type="hidden" value={{ x.time_slot_id }} id="time_slot_id"
+                                               name="time_slot_id"/>
+                                        <button type="submit">Запись</button>
+                                    </p>
+                                </form>
+                                <form action="{% url 'plan_info' %}" method="post">>
+                                    {% if user.is_staff %}
+                                        {% csrf_token %}
+                                        <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
+                                               name="is_group_zone"/>
+                                        <input type="hidden" value={{ day }} id="date" name="date"/>
+                                        <input type="hidden" value={{ zone }} id="zone" name="zone"/>
+                                        <input type="hidden" value={{ fitness_club }} id="fitness_club"
+                                               name="fitness_club"/>
+                                        <input type="hidden" value={{ x.time_slot_id }} id="time_slot_id"
+                                               name="time_slot_id"/>
+                                        <button type="submit">Показать</button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <table border='1'>
+                    <tr>
+                        <th>Начало</th>
+                        <th>Конец</th>
+                        <th>Занятие</th>
+                        <th>Статус</th>
+                        <th>Комментарий</th>
+                        <th>Кол-во клиентов</th>
+                        <th>Записаться</th>
+                    </tr>
+                    {% for x in time_slots_for_day %}
+                        <tr>
+                            <td>{{ x.start }}</td>
+                            <td>{{ x.end }}</td>
+                            <td>{{ x.group }}</td>
+                            <td>{{ x.group_status }}</td>
+                            <td>{{ x.comment }}</td>
+                            {% if x.group %}
+                                <td>{{ x.clients_count }}</td>
+                                <td>
+                                    <form action="{% url 'plan_add' %}" method="post">
+                                        <p>
+                                            {% csrf_token %}
+                                            <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
+                                                   name="is_group_zone"/>
+                                            <input type="hidden" value={{ x.schedule }} id="schedule" name="schedule"/>
+                                            <button type="submit">Запись</button>
+                                        </p>
+                                    </form>
+                                    <form action="{% url 'plan_info' %}" method="post">>
+                                        {% if user.is_staff %}
+                                            {% csrf_token %}
+                                            <input type="hidden" value={{ day }} id="date" name="date"/>
+                                            <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
+                                                   name="is_group_zone"/>
+                                            <input type="hidden" value={{ x.schedule }} id="schedule" name="schedule"/>
+                                            <button type="submit">Показать</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            {% else %}
+                                <td></td>
+                                <td></td>>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <h2>Сегодня клуб не работает!</h2>
+    {% endif %}
 {% endblock %}

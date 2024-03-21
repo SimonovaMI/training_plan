@@ -27,4 +27,3 @@ admin.site.register(PlanGroup)
 admin.site.register(TimeSlot)
 admin.site.register(DayType)
 admin.site.register(SpecialDay)
-

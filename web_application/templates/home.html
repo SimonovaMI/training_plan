@@ -1,16 +1,15 @@
 {% extends "base.html" %}
-
 {% block content %}
-  <h2>Добрый день, {{ user.get_username }}!</h2>
+    <h2>Добрый день, {{ user.get_username }}!</h2>
     <p>Хотите посмотреть загруженнось зала?</p>
     <form action="{% url 'plans_for_date_club_zone' %}" method="post">
         <p>Выберите интересующую Вас дату:</p>
         {% csrf_token %}
         <p>
-           {{ date.as_p }}
+            {{ date.as_p }}
         </p>
         <p>
-           <button type="submit">Посмотреть</button>
+            <button type="submit">Посмотреть</button>
         </p>
     </form>
 {% endblock %}

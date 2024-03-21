@@ -1,4 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-    
+    <h2>Планируемые посещения c детализацией посетителей на {{ day }}</h2>
+    {% if clients %}
+        <table border='1'>
+            <tr>
+                <th>ФИО</th>
+                <th>Телефон</th>
+            </tr>
+            {% for x in clients %}
+                <tr>
+                    <td>{{ x.name }}</td>
+                    <td>{{ x.phone }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 {% endblock %}

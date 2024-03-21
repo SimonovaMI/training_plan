@@ -11,5 +11,4 @@ urlpatterns = [
     path('plans_for_date_club_zone/plan/', views.plan, name='plan'),
     path('plans_for_date_club_zone/', views.plans_for_date_club_zone, name='plans_for_date_club_zone')
 
-
 ]
