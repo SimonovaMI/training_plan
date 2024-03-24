@@ -2,6 +2,9 @@
 {% block content %}
     <h2>Добрый день, {{ user.get_username }}!</h2>
     <p>Хотите посмотреть загруженнось зала?</p>
+    {% if user.is_staff %}
+        <p>Или хотите составить расписание групповых программ?</p>
+    {% endif %}
     <form action="{% url 'plans_for_date_club_zone' %}" method="post">
         <p>Выберите интересующую Вас дату:</p>
         {% csrf_token %}

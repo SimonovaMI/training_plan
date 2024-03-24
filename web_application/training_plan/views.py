@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.utils import IntegrityError
 from training_plan.models import *
 from . import forms
-from . models import Schedule as sched
+from .models import Schedule
 
 
 @login_required
@@ -79,7 +79,7 @@ def plan(request):
                     time_slot['schedule'] = schedule.schedule_id
                     group = Group.objects.get(schedule=schedule)
                     time_slot['group'] = group.tittle
-                    time_slot['group_status'] = sched.GROUP_STATUS[schedule.group_status]
+                    time_slot['group_status'] = Schedule.GROUP_STATUS[schedule.group_status]
                     if schedule.comment:
                         time_slot['comment'] = schedule.comment
                     else:
@@ -233,7 +233,7 @@ def client_plan_for_date(request):
             for i in client_in_schedule:
                 client_plan_dict = {'start_date_time': i.time_slot.start.strftime('%H:%M'),
                                     'end_date_time': i.time_slot.end.strftime('%H:%M'), 'zone': i.club_zone,
-                                    'fitness_club': i.fitness_club_id, 'plan_id': i.schedule, 'is_group': 'True'}
+                                    'fitness_club': i.fitness_club_id, 'plan_id': i.schedule_id, 'is_group': 'True'}
                 result.append(client_plan_dict)
 
         get_plan_result()
@@ -263,3 +263,110 @@ def client_plan_delete(request):
         return render(request, 'client_plan_delete.html')
     else:
         return HttpResponseRedirect(reverse('client_plan'))
+
+
+def create_schedule(request):
+    if request.method == 'POST':
+        day = request.POST.get('date')
+        print(day)
+        time_slot_id = request.POST.get('time_slot_id')
+        print(time_slot_id)
+        fitness_club = request.POST.get('fitness_club')
+        zone = request.POST.get('zone')
+        groups = Group.objects.all().values()
+        group_status = Schedule.GROUP_STATUS.values()
+        return render(request, 'create_schedule.html', {'day': day, 'time_slot_id': time_slot_id,
+                                                        'fitness_club': fitness_club, 'zone': zone, 'groups': groups,
+                                                        'group_status': group_status})
+    else:
+        return HttpResponseRedirect(reverse('home'))
+
+
+def delete_schedule(request):
+    if request.method == 'POST':
+        schedule = request.POST.get('schedule')
+        schedule_obj = Schedule.objects.get(schedule_id=schedule)
+        schedule_obj.delete()
+        return render(request, 'delete_schedule.html')
+    else:
+        return HttpResponseRedirect(reverse('home'))
+
+
+def revoke_schedule(request):
+    if request.method == 'POST':
+        schedule = request.POST.get('schedule')
+        schedule_obj = Schedule.objects.get(schedule_id=schedule)
+        schedule_obj.group_status = 'canceled'
+        schedule_obj.save()
+        return render(request, 'revoke_schedule.html')
+    else:
+        return HttpResponseRedirect(reverse('home'))
+
+
+def update_schedule(request):
+    if request.method == 'POST':
+        schedule = request.POST.get('schedule')
+        schedule_obj = Schedule.objects.get(schedule_id=schedule)
+        groups = Group.objects.all().values()
+        group_status = Schedule.GROUP_STATUS.values()
+        return render(request, 'update_schedule.html', {'schedule': schedule_obj, 'group': groups,
+                                                        'group_status': group_status})
+    else:
+        return HttpResponseRedirect(reverse('home'))
+
+
+def update_schedule_result(request):
+    if request.method == 'POST':
+        schedule = request.POST.get('schedule')
+        schedule_obj = Schedule.objects.get(schedule_id=schedule)
+        group = request.POST.get('group')
+        group_obj = Group.objects.get(tittle=group)
+        comment = request.POST.get('comment')
+        schedule_obj.group = group_obj
+        schedule_obj.comment = comment
+        try:
+            schedule_obj.save()
+        except IntegrityError as e:
+            return render(request, 'update_schedule_result.html', {'message': 'Такой слот'
+                                                                              ' в расписании уже есть!'})
+        return render(request, 'update_schedule_result.html', {'message': 'Изменения успешно '
+                                                                          'сохранены.'})
+
+
+def create_schedule_result(request):
+    if request.method == 'POST':
+        day = request.POST.get('date')
+        day_date = datetime.strptime(day, '%d-%m-%Y').date()
+        time_slot_id = request.POST.get('time_slot_id')
+        time_slot_obj = TimeSlot.objects.get(time_slot_id=time_slot_id)
+        fitness_club_id = request.POST.get('fitness_club')
+        fitness_club_obj = FitnessClub.objects.get(club_id=fitness_club_id)
+        zone_id = request.POST.get('zone')
+        zone_obj = ClubZone.objects.get(zone_id=zone_id)
+        group = request.POST.get('groups')
+        group_obj = Group.objects.get(tittle=group)
+        group_status = request.POST.get('group_status')
+        if group_status == 'отменено':
+            group_status = 'canceled'
+        else:
+            group_status = 'planned'
+
+        comment = request.POST.get('comment')
+
+        schedule_obj = Schedule()
+        schedule_obj.day = day_date
+        schedule_obj.time_slot = time_slot_obj
+        schedule_obj.group = group_obj
+        schedule_obj.club_zone = zone_obj
+        schedule_obj.fitness_club = fitness_club_obj
+        schedule_obj.comment = comment
+        schedule_obj.group_status = group_status
+        try:
+            schedule_obj.save()
+        except IntegrityError as e:
+            return render(request, 'create_schedule_result.html', {'message': 'Такой слот'
+                                                                              ' в расписании уже есть!'})
+        return render(request, 'create_schedule_result.html', {'message': 'Расписание успешно '
+                                                                          'создано.'})
+
+    return render(request, 'create_schedule_result.html')

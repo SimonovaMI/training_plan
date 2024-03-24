@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+    <form action="{% url 'update_schedule_result' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" value={{ schedule.schedule_id }} id="schedule" name="schedule"/>
+        <p>
+            <label for="select">Группа: </label>
+            <label>
+                <select name="group">
+                    {% for i in group %}
+                        <option
+                                {% if schedule.group == i %}
+                                    selected="selected"
+                                {% endif %}
+                                    value="{{ i.tittle }}">{{ i.tittle }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </label>
+        <p>
+            <label for="comment">Комментарий: </label>
+        </p>
+        <textarea id="comment" name="comment" rows="5" cols="50" maxlength="150">
+                {% if schedule.comment %}
+                    {{ schedule.comment }}
+                {% endif %}
+        </textarea>
+        <p>
+            <button type="submit">Изменить</button>
+        </p>
+    </form>
+{% endblock %}

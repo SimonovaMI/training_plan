@@ -132,14 +132,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/training_plan'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'trainingplanfitnessclub@gmail.com '
-# EMAIL_HOST_PASSWORD = '12341234tp'
-# EMAIL_PORT = 25
-# EMAIL_USE_SSL = True
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'trainingplanfitnessclub@gmail.com '
+EMAIL_HOST_PASSWORD = '12341234tp'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 DATE_FORMAT = '%d-%m-%Y'
 DATE_INPUT_FORMATS = '%d-%m-%Y'
