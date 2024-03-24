@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
+from django.db.models import CheckConstraint, Q, F
 
 
 class FitnessClub(models.Model):
@@ -26,6 +27,13 @@ class FitnessClub(models.Model):
         managed = True
         db_table = 'fitness_club'
         ordering = ['tittle']
+        constraints = [
+            CheckConstraint(
+                check=Q(date_terminated__gt=F('date_created')),
+                name='check_date_terminated_greater_than_date_created_club',
+                violation_error_message='Date of termination must be greater than date of creation'
+            ),
+        ]
 
 
 class ClubZone(models.Model):
@@ -46,6 +54,13 @@ class ClubZone(models.Model):
         managed = True
         db_table = 'club_zones'
         ordering = ['tittle']
+        constraints = [
+            CheckConstraint(
+                check=Q(date_terminated__gt=F('date_created')),
+                name='check_date_terminated_greater_than_date_created_zone',
+                violation_error_message='Date of termination must be greater than date of creation'
+            ),
+        ]
 
 
 class ClubCard(models.Model):
@@ -65,6 +80,13 @@ class ClubCard(models.Model):
         db_table = 'club_cards'
         ordering = ['date_added', 'number_of_card']
         unique_together = ('number_of_card', 'date_of_registration', 'date_of_termination')
+        constraints = [
+            CheckConstraint(
+                check=Q(date_of_termination__gt=F('date_of_registration')),
+                name='check_date_terminated_greater_than_date_registered',
+                violation_error_message='Date of termination must be greater than date of registration'
+            ),
+        ]
 
 
 class UserAdditionalInfo(models.Model):
@@ -103,6 +125,13 @@ class TimeSlot(models.Model):
         db_table = 'time_slots'
         unique_together = ('start', 'end')
         ordering = ['start']
+        constraints = [
+            CheckConstraint(
+                check=Q(end__gt=F('start')),
+                name='check_end_greater_than_start',
+                violation_error_message='End must be greater than start'
+            ),
+        ]
 
     def __str__(self):
         return f'{self.start} - {self.end}'
@@ -148,10 +177,9 @@ class Schedule(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, help_text='Enter the group of the schedule')
     club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
-                                                                                         'schedule')
+                                                                                      'schedule')
     comment = models.CharField(max_length=150, blank=True, null=True, help_text='Enter a comfortable number '
                                                                                 'of visitors, trainers name')
-   # GROUP_STATUS = [('canceled', 'отменено'), ('planned', 'планируется')]
     GROUP_STATUS = {'canceled': 'отменено', 'planned': 'планируется'}
     group_status = models.CharField(max_length=8, choices=GROUP_STATUS, default='planned')
 
