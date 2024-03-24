@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 from django.db.models import CheckConstraint, Q, F
+from django.utils import timezone
 
 
 class FitnessClub(models.Model):
@@ -197,7 +198,7 @@ class Schedule(models.Model):
 class Plan(models.Model):
     plan_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    day = models.DateField()
+    day = models.DateField(default=timezone.now)
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
     club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE)
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)

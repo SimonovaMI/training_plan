@@ -107,30 +107,32 @@ def plans_for_date_club_zone(request):
         day = request.POST.get('day')
         day_date = datetime.strptime(day, '%Y-%m-%d').date()
         user = request.user
+        try:
+            user_info = user.useradditionalinfo
+            cards = list(user_info.club_cards.all())
 
-        user_info = user.useradditionalinfo
-        cards = list(user_info.club_cards.all())
+            for card in cards:
+                if card.date_of_registration <= day_date < card.date_of_termination:
+                    active_card = True
+                    card_clubs = card.fitness_club.values()
+                    clubs += card_clubs
+            if not active_card:
+                message += 'На выбранную дату у Вас нет действующей клубной карты. '
 
-        for card in cards:
-            if card.date_of_registration <= day_date < card.date_of_termination:
-                active_card = True
-                card_clubs = card.fitness_club.values()
-                clubs += card_clubs
-        if not active_card:
-            message += 'На выбранную дату у Вас нет действующей клубной карты. '
+            clubs_id = [club['club_id'] for club in clubs]
+            club_zones = ClubZone.objects.all()
+            for club in clubs_id:
+                zones += club_zones.filter(fitness_club=club)
 
-        clubs_id = [club['club_id'] for club in clubs]
-        club_zones = ClubZone.objects.all()
-        for club in clubs_id:
-            zones += club_zones.filter(fitness_club=club)
-
-        clubs = [club['tittle'] for club in clubs]
-        if message:
+            clubs = [club['tittle'] for club in clubs]
+            if message:
+                return render(request, 'plans_for_date_club_zone.html', {'message': message})
+            else:
+                return render(request, 'plans_for_date_club_zone.html', {'clubs': clubs,
+                                                                         'zones': set(zones), 'day': day})
+        except UserAdditionalInfo.DoesNotExist:
+            message = 'Обратитесь к администратору. Введенной информации недостаточно для корректной работы программы.'
             return render(request, 'plans_for_date_club_zone.html', {'message': message})
-        else:
-            return render(request, 'plans_for_date_club_zone.html', {'clubs': clubs,
-                                                                     'zones': set(zones), 'day': day})
-
     else:
         return HttpResponseRedirect(reverse('home'))
 
@@ -145,8 +147,8 @@ def plan_add(request):
             # print(f'''{plan_group.client} {plan_group.schedule.day} {plan_group.schedule.time_slot}
             # {plan_group.schedule.club_zone} {plan_group.schedule.fitness_club}''')
             print(Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
-                                       time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
-                                       fitness_club=plan_group.schedule.fitness_club))
+                                      time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
+                                      fitness_club=plan_group.schedule.fitness_club))
             try:
                 # if Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
                 #                        time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
