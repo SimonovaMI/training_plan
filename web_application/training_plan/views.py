@@ -142,7 +142,17 @@ def plan_add(request):
             plan_group = PlanGroup()
             plan_group.client = User.objects.get(id=request.user.id)
             plan_group.schedule = Schedule.objects.get(schedule_id=request.POST.get('schedule'))
+            # print(f'''{plan_group.client} {plan_group.schedule.day} {plan_group.schedule.time_slot}
+            # {plan_group.schedule.club_zone} {plan_group.schedule.fitness_club}''')
+            print(Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
+                                       time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
+                                       fitness_club=plan_group.schedule.fitness_club))
             try:
+                # if Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
+                #                        time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
+                #                        fitness_club=plan_group.schedule.fitness_club):
+                #     print("yes")
+                #     raise IntegrityError()
                 plan_group.save()
             except IntegrityError as e:
                 return render(request, 'plan_add.html', {'message': 'Вы уже записаны на этот слот.'
@@ -231,9 +241,10 @@ def client_plan_for_date(request):
             client_in_schedule = list(filter(lambda x: x.schedule_id in client_id_schedule, schedules))
 
             for i in client_in_schedule:
+                print(i.schedule_id)
                 client_plan_dict = {'start_date_time': i.time_slot.start.strftime('%H:%M'),
                                     'end_date_time': i.time_slot.end.strftime('%H:%M'), 'zone': i.club_zone,
-                                    'fitness_club': i.fitness_club_id, 'plan_id': i.schedule_id, 'is_group': 'True'}
+                                    'fitness_club': i.fitness_club, 'plan_id': i.schedule_id, 'is_group': 'True'}
                 result.append(client_plan_dict)
 
         get_plan_result()
@@ -252,9 +263,8 @@ def client_plan_delete(request):
     if request.method == 'POST':
         plan_id_req = request.POST.get('plan_ident')
         is_group = request.POST.get('is_group')
-
         if is_group == 'True':
-            plan_group_obj = PlanGroup.objects.get(plan_group_id=plan_id_req)
+            plan_group_obj = PlanGroup.objects.get(schedule_id=plan_id_req)
             plan_group_obj.delete()
         else:
             plan_obj = Plan.objects.get(plan_id=plan_id_req)
@@ -265,12 +275,11 @@ def client_plan_delete(request):
         return HttpResponseRedirect(reverse('client_plan'))
 
 
+@login_required
 def create_schedule(request):
     if request.method == 'POST':
         day = request.POST.get('date')
-        print(day)
         time_slot_id = request.POST.get('time_slot_id')
-        print(time_slot_id)
         fitness_club = request.POST.get('fitness_club')
         zone = request.POST.get('zone')
         groups = Group.objects.all().values()
@@ -282,6 +291,7 @@ def create_schedule(request):
         return HttpResponseRedirect(reverse('home'))
 
 
+@login_required
 def delete_schedule(request):
     if request.method == 'POST':
         schedule = request.POST.get('schedule')
@@ -292,6 +302,7 @@ def delete_schedule(request):
         return HttpResponseRedirect(reverse('home'))
 
 
+@login_required
 def revoke_schedule(request):
     if request.method == 'POST':
         schedule = request.POST.get('schedule')
@@ -303,6 +314,7 @@ def revoke_schedule(request):
         return HttpResponseRedirect(reverse('home'))
 
 
+@login_required
 def update_schedule(request):
     if request.method == 'POST':
         schedule = request.POST.get('schedule')
@@ -315,6 +327,7 @@ def update_schedule(request):
         return HttpResponseRedirect(reverse('home'))
 
 
+@login_required
 def update_schedule_result(request):
     if request.method == 'POST':
         schedule = request.POST.get('schedule')
@@ -333,6 +346,7 @@ def update_schedule_result(request):
                                                                           'сохранены.'})
 
 
+@login_required
 def create_schedule_result(request):
     if request.method == 'POST':
         day = request.POST.get('date')
