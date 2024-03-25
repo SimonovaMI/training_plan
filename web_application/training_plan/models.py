@@ -6,26 +6,26 @@ from django.utils import timezone
 
 class FitnessClub(models.Model):
     club_id = models.AutoField(primary_key=True)
-    tittle = models.CharField(max_length=255, help_text='Enter the tittle of the fitness club', unique=True)
-    post_index = models.CharField(max_length=10, blank=True, null=True, help_text='Enter the post code of the '
-                                                                                  'fitness club')
-    country = models.CharField(max_length=45, blank=True, null=True, help_text='Enter the country of the fitness club')
-    city = models.CharField(max_length=45, blank=True, null=True, help_text='Enter the city of the fitness club')
-    address = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the address of the fitness club')
-    phone_number = models.CharField(max_length=12, blank=True, null=True, help_text='Enter the phone number of the '
-                                                                                    'fitness club in form like this - '
-                                                                                    '+79991112233')
-    email = models.CharField(max_length=50, blank=True, null=True, help_text='Enter the email of the fitness club in '
-                                                                             'form like this address@mail.ru')
-    date_created = models.DateField(help_text='Enter the date the fitness club was opened')
-    date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the fitness club was closed', )
-    comment = models.TextField(help_text='Enter information about the fitness club, zones', blank=True, null=True)
+    tittle = models.CharField(max_length=255, unique=True, verbose_name='Название клуба')
+    post_index = models.CharField(max_length=10, blank=True, null=True, verbose_name='Почтовый индекс')
+    country = models.CharField(max_length=45, blank=True, null=True, verbose_name='Страна')
+    city = models.CharField(max_length=45, blank=True, null=True, verbose_name='Город')
+    address = models.CharField(max_length=255, blank=True, null=True, verbose_name='Адрес')
+    phone_number = models.CharField(max_length=12, blank=True, null=True, verbose_name='Телефон')
+    email = models.CharField(max_length=50, blank=True, null=True, verbose_name='Эл. почта',
+                             help_text='Введите адрес электронной почты, вида adress@mai.ru')
+    date_created = models.DateField(verbose_name='Дата открытия')
+    date_terminated = models.DateField(null=True, blank=True, verbose_name='Дата закрытия')
+    comment = models.TextField(verbose_name='Комментарий',
+                               help_text='Введите информацию о фитнес-клубе, о зонах посещения', blank=True, null=True)
 
     def __str__(self):
         return f'{self.tittle} - {self.address}'
 
     class Meta:
         managed = True
+        verbose_name = 'Фитнес-клуб'
+        verbose_name_plural = 'Фитнес-клубы'
         db_table = 'fitness_club'
         ordering = ['tittle']
         constraints = [
@@ -39,19 +39,19 @@ class FitnessClub(models.Model):
 
 class ClubZone(models.Model):
     zone_id = models.AutoField(primary_key=True)
-    tittle = models.CharField(unique=True, max_length=50, help_text='Enter the tittle of the fitness zone')
-    description = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the description of '
-                                                                                    'the fitness zone')
-    fitness_club = models.ManyToManyField(FitnessClub, help_text='Choose the fitness clubs')
-    date_created = models.DateField(help_text='Enter the date the zone of the fitness club '
-                                              'was opened')
-    date_terminated = models.DateField(null=True, blank=True, help_text='Enter the date the zone  the fitness club'
-                                                                        ' was closed')
+    tittle = models.CharField(unique=True, max_length=50, verbose_name='Название зоны фитнес-клуба')
+    description = models.CharField(max_length=255, blank=True, null=True, verbose_name='Описание')
+    fitness_club = models.ManyToManyField(FitnessClub, help_text='Выберите фитнес-клубы, где есть создаваемая зона',
+                                          verbose_name='Фитнес-клубы')
+    date_created = models.DateField(verbose_name='Дата открытия')
+    date_terminated = models.DateField(null=True, blank=True, verbose_name='Дата закрытия')
 
     def __str__(self):
         return self.tittle
 
     class Meta:
+        verbose_name = 'Зона фитнес-клуба'
+        verbose_name_plural = 'Зоны фитнес-клуба'
         managed = True
         db_table = 'club_zones'
         ordering = ['tittle']
@@ -66,17 +66,19 @@ class ClubZone(models.Model):
 
 class ClubCard(models.Model):
     card_id = models.AutoField(primary_key=True)
-    number_of_card = models.CharField(max_length=20, help_text='Enter a card number')
-    fitness_club = models.ManyToManyField(FitnessClub, help_text='Choose the fitness clubs')
-    description = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the description of the card')
-    date_of_registration = models.DateField(help_text='Enter the date of registration of the card')
-    date_of_termination = models.DateField(help_text='Enter the date of termination of the card')
-    date_added = models.DateField(auto_now_add=True, help_text='Enter the date the entry was added')
+    number_of_card = models.CharField(max_length=20, verbose_name='Номер карты')
+    fitness_club = models.ManyToManyField(FitnessClub, verbose_name='Фитнес-клубы')
+    description = models.CharField(max_length=255, blank=True, null=True, verbose_name='Описание условий карты')
+    date_of_registration = models.DateField(verbose_name='Дата начала действия')
+    date_of_termination = models.DateField(verbose_name='Дата окончания действия')
+    date_added = models.DateField(auto_now_add=True, verbose_name='Дата добавления карты в систему')
 
     def __str__(self):
         return f'{self.number_of_card}'
 
     class Meta:
+        verbose_name = 'Клубная карта'
+        verbose_name_plural = 'Клубные карты'
         managed = True
         db_table = 'club_cards'
         ordering = ['date_added', 'number_of_card']
@@ -92,22 +94,30 @@ class ClubCard(models.Model):
 
 class UserAdditionalInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    birthdate = models.DateField(help_text='Enter the birthdate')
-    phone_number = models.CharField(max_length=12, help_text='Enter the phone number of the client')
-    club_cards = models.ManyToManyField(ClubCard, help_text='Enter the club cards of the user')
+    birthdate = models.DateField(help_text='Enter the birthdate', verbose_name='Дата рождения')
+    phone_number = models.CharField(max_length=12, help_text='Enter the phone number of the client',
+                                    verbose_name='Номер телефона')
+    club_cards = models.ManyToManyField(ClubCard, help_text='Enter the club cards of the user',
+                                        verbose_name='Клубные карты')
 
     def __str__(self):
         return f'{self.user.username}'
 
+    class Meta:
+        verbose_name = 'Информация о клиенте'
+        verbose_name_plural = 'Информация о клиенте'
+
 
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)
-    tittle = models.CharField(max_length=50, help_text='Enter the title of the group', unique=True)
-    description = models.CharField(max_length=255, blank=True, null=True, help_text='Enter the description of the '
-                                                                                    'group')
-    club_zones = models.ManyToManyField(ClubZone, help_text='Enter the club zones of the group')
+    tittle = models.CharField(max_length=50, unique=True,
+                              verbose_name='Название группы')
+    description = models.CharField(max_length=255, blank=True, null=True, verbose_name='Описание')
+    club_zones = models.ManyToManyField(ClubZone, verbose_name='Зоны клуба')
 
     class Meta:
+        verbose_name = 'Группа'
+        verbose_name_plural = 'Группы'
         managed = True
         db_table = 'groups'
         ordering = ['tittle']
@@ -118,10 +128,12 @@ class Group(models.Model):
 
 class TimeSlot(models.Model):
     time_slot_id = models.AutoField(primary_key=True)
-    start = models.TimeField()
-    end = models.TimeField()
+    start = models.TimeField(verbose_name='Начало')
+    end = models.TimeField(verbose_name='Конец')
 
     class Meta:
+        verbose_name = 'Временной слот'
+        verbose_name_plural = 'Временные слоты'
         managed = True
         db_table = 'time_slots'
         unique_together = ('start', 'end')
@@ -140,28 +152,32 @@ class TimeSlot(models.Model):
 
 class DayType(models.Model):
     day_type_id = models.AutoField(primary_key=True)
-    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
     DAY_TYPE_TITTLES = [('work_day', 'будни'), ('weekend', 'выходной'), ('holiday', 'праздник'), ('special_day',
                                                                                                   'предпраздничный день')]
-    day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, unique=True)
-    time_slots = models.ManyToManyField(TimeSlot, blank=True, null=True)
+    day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, unique=True, verbose_name='Тип дня')
+    time_slots = models.ManyToManyField(TimeSlot, blank=True, null=True, verbose_name='Временные слоты')
 
     class Meta:
+        verbose_name = 'Тип дня'
+        verbose_name_plural = 'Типы дней'
         managed = True
         db_table = 'day_type'
         ordering = ['day_type_tittle']
 
     def __str__(self):
-        return f'{self.fitness_club} - {self.day_type_tittle}'
+        return f'{self.fitness_club} - {[x[1] for x in DayType.DAY_TYPE_TITTLES if x[0] == self.day_type_tittle][0]}'
 
 
 class SpecialDay(models.Model):
     special_day_id = models.AutoField(primary_key=True)
-    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
-    day = models.DateField()
-    type_of_day = models.ForeignKey(DayType, on_delete=models.CASCADE)
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
+    day = models.DateField(verbose_name='День')
+    type_of_day = models.ForeignKey(DayType, on_delete=models.CASCADE, verbose_name='Тип дня')
 
     class Meta:
+        verbose_name = 'Особый день'
+        verbose_name_plural = 'Особые дни'
         managed = True
         db_table = 'special_days'
         unique_together = ('fitness_club', 'day')
@@ -173,18 +189,19 @@ class SpecialDay(models.Model):
 
 class Schedule(models.Model):
     schedule_id = models.AutoField(primary_key=True)
-    day = models.DateField()
-    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, help_text='Enter the group of the schedule')
-    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, help_text='Enter the zone of the schedule')
-    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, help_text='Enter the zone of the '
-                                                                                      'schedule')
-    comment = models.CharField(max_length=150, blank=True, null=True, help_text='Enter a comfortable number '
-                                                                                'of visitors, trainers name')
+    day = models.DateField(verbose_name='День')
+    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, verbose_name='Временной слот')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name='Группа')
+    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, verbose_name='Зона клуба')
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
+    comment = models.CharField(max_length=150, blank=True, null=True, help_text='Введите комфортное число клиентов, '
+                                                                                'тренера', verbose_name='Комментарий')
     GROUP_STATUS = {'canceled': 'отменено', 'planned': 'планируется'}
-    group_status = models.CharField(max_length=8, choices=GROUP_STATUS, default='planned')
+    group_status = models.CharField(max_length=8, choices=GROUP_STATUS, default='planned', verbose_name='Статус группы')
 
     class Meta:
+        verbose_name = 'Расписание'
+        verbose_name_plural = 'Расписание'
         managed = True
         db_table = 'schedule'
         ordering = ['day', 'time_slot', 'group']
@@ -197,13 +214,15 @@ class Schedule(models.Model):
 
 class Plan(models.Model):
     plan_id = models.AutoField(primary_key=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE)
-    day = models.DateField(default=timezone.now)
-    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
-    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE)
-    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Клиент')
+    day = models.DateField(default=timezone.now, verbose_name='День')
+    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, verbose_name='Временной слот')
+    club_zone = models.ForeignKey(ClubZone, on_delete=models.CASCADE, verbose_name='Зона фитнес-клуба')
+    fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
 
     class Meta:
+        verbose_name = 'Планирование свободного посещения'
+        verbose_name_plural = 'Планирование свободного посещения'
         managed = True
         db_table = 'plan'
         unique_together = ('client', 'club_zone', 'day', 'time_slot')
@@ -216,10 +235,12 @@ class Plan(models.Model):
 
 class PlanGroup(models.Model):
     plan_group_id = models.AutoField(primary_key=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE)
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Клиент')
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, verbose_name='Расписание')
 
     class Meta:
+        verbose_name = 'Планирование посещения группового занятия'
+        verbose_name_plural = 'Планирование посещения группового занятия'
         managed = True
         db_table = 'plan_groups'
         unique_together = ('client', 'schedule')

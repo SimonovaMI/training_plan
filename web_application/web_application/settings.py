@@ -113,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-Ru'
 
 TIME_ZONE = 'Europe/Moscow'
 
@@ -141,9 +141,3 @@ EMAIL_HOST_PASSWORD = 'earr vrmn gxjp rlvo'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-DATE_FORMAT = '%d-%m-%Y'
-DATE_INPUT_FORMATS = '%d-%m-%Y'
-DATETIME_FORMAT = '%d-%m-%Y %H:%M'
-DATETIME_INPUT_FORMATS = '%d-%m-%Y %H:%M'
-TIME_FORMAT = '%H:%M'
-TIME_INPUT_FORMATS = '%H:%M'
