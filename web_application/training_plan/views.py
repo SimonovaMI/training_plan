@@ -37,7 +37,9 @@ def plan(request):
 
         fitness_zone = request.POST.get('fitness_zone')
         fitness_zone_db = ClubZone.objects.filter(tittle=fitness_zone, fitness_club=fitness_club_db.club_id).first()
+        print(fitness_zone_db)
         if fitness_zone_db:
+            print(1)
             is_group_zone = Schedule.objects.filter(club_zone_id=fitness_zone_db.zone_id).exists()
             if not fitness_zone_db.date_terminated:
                 if fitness_zone_db.date_created > day_date:
@@ -46,20 +48,24 @@ def plan(request):
                 if fitness_zone_db.date_created > day_date or day_date >= fitness_zone_db.date_terminated:
                     message += 'Фитнес-зона в выбранную дату закрыта. '
         else:
+            print(2)
             message += 'Фитнес-зоны в выбранном фитнес-клубе нет. '
-
+        print(message)
         if message:
             return render(request, 'plan.html', {'day': day, 'message': message})
 
-        is_special_day = SpecialDay.objects.filter(day=day_date).first()
-        if is_special_day:
-            time_slots_for_day = DayType.objects.filter(
-                day_type_tittle=is_special_day.type_of_day.day_type_tittle).first().time_slots.values()
+        is_special_day = SpecialDay.objects.filter(day=day_date, fitness_club=fitness_club_db).first()
+        if is_special_day and is_special_day.type_of_day.fitness_club == fitness_club_db:
+            time_slots_for_day = (DayType.objects.filter(
+                day_type_tittle=is_special_day.type_of_day.day_type_tittle, fitness_club=fitness_club_db).first().
+                                  time_slots.values())
         else:
             if day_date.weekday() in [5, 6]:
-                time_slots_for_day = DayType.objects.filter(day_type_tittle='weekend').first().time_slots.values()
+                time_slots_for_day = (DayType.objects.filter(day_type_tittle='weekend', fitness_club=fitness_club_db).
+                                      first().time_slots.values())
             else:
-                time_slots_for_day = DayType.objects.filter(day_type_tittle='work_day').first().time_slots.values()
+                time_slots_for_day = (DayType.objects.filter(day_type_tittle='work_day', fitness_club=fitness_club_db).
+                                      first().time_slots.values())
 
         for time_slot in time_slots_for_day:
             time_slot['start'] = time_slot['start'].strftime('%H:%M')
@@ -79,7 +85,11 @@ def plan(request):
                     time_slot['schedule'] = schedule.schedule_id
                     group = Group.objects.get(schedule=schedule)
                     time_slot['group'] = group.tittle
-                    time_slot['group_status'] = Schedule.GROUP_STATUS[schedule.group_status]
+                    if schedule.group_status == 'canceled':
+                        group_status = 'отменено'
+                    else:
+                        group_status = 'планируется'
+                    time_slot['group_status'] = group_status
                     if schedule.comment:
                         time_slot['comment'] = schedule.comment
                     else:
@@ -144,17 +154,7 @@ def plan_add(request):
             plan_group = PlanGroup()
             plan_group.client = User.objects.get(id=request.user.id)
             plan_group.schedule = Schedule.objects.get(schedule_id=request.POST.get('schedule'))
-            # print(f'''{plan_group.client} {plan_group.schedule.day} {plan_group.schedule.time_slot}
-            # {plan_group.schedule.club_zone} {plan_group.schedule.fitness_club}''')
-            print(Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
-                                      time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
-                                      fitness_club=plan_group.schedule.fitness_club))
             try:
-                # if Plan.objects.filter(client=plan_group.client, day=plan_group.schedule.day,
-                #                        time_slot=plan_group.schedule.time_slot, club_zone=plan_group.schedule.club_zone,
-                #                        fitness_club=plan_group.schedule.fitness_club):
-                #     print("yes")
-                #     raise IntegrityError()
                 plan_group.save()
             except IntegrityError as e:
                 return render(request, 'plan_add.html', {'message': 'Вы уже записаны на этот слот.'
@@ -277,6 +277,10 @@ def client_plan_delete(request):
         return HttpResponseRedirect(reverse('client_plan'))
 
 
+def get_group_status():
+    return [x[1] for x in Schedule.GROUP_STATUS]
+
+
 @login_required
 def create_schedule(request):
     if request.method == 'POST':
@@ -285,7 +289,7 @@ def create_schedule(request):
         fitness_club = request.POST.get('fitness_club')
         zone = request.POST.get('zone')
         groups = Group.objects.all().values()
-        group_status = Schedule.GROUP_STATUS.values()
+        group_status = get_group_status()
         return render(request, 'create_schedule.html', {'day': day, 'time_slot_id': time_slot_id,
                                                         'fitness_club': fitness_club, 'zone': zone, 'groups': groups,
                                                         'group_status': group_status})
@@ -322,7 +326,7 @@ def update_schedule(request):
         schedule = request.POST.get('schedule')
         schedule_obj = Schedule.objects.get(schedule_id=schedule)
         groups = Group.objects.all().values()
-        group_status = Schedule.GROUP_STATUS.values()
+        group_status = get_group_status()
         return render(request, 'update_schedule.html', {'schedule': schedule_obj, 'group': groups,
                                                         'group_status': group_status})
     else:

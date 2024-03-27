@@ -3,11 +3,11 @@
     {% if comment %}
         <h2 style="color: #ba2121">{{ comment }}</h2>
     {% endif %}
-    {% if time_slots_for_day %}
-        <h2>Планируемые посещения на {{ day }}</h2>
-        {% if message %}
-            <h3>{{ message }}</h3>
-        {% else %}
+    <h2>Планируемые посещения на {{ day }}</h2>
+    {% if message %}
+        <h3>{{ message }}</h3>
+    {% else %}
+        {% if time_slots_for_day %}
             {% if not is_group_zone %}
                 <table border='1'>
                     <tr>
@@ -145,8 +145,8 @@
                     {% endfor %}
                 </table>
             {% endif %}
+        {% else %}
+            <h2>Сегодня клуб не работает!</h2>
         {% endif %}
-    {% else %}
-        <h2>Сегодня клуб не работает!</h2>
     {% endif %}
 {% endblock %}

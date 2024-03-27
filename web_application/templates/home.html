@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-    <h2>Добрый день, {{ user.get_username }}!</h2>
+    {% if user.first_name %}
+        <h2>Добрый день, {{ user.first_name }}!</h2>
+    {% else %}
+        <h2>Добрый день!</h2>
+    {% endif %}
     <p>Хотите посмотреть загруженнось зала?</p>
     {% if user.is_staff %}
         <p>Или хотите составить расписание групповых программ?</p>

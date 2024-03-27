@@ -1,3 +1,5 @@
+
+
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
 from django.db.models import CheckConstraint, Q, F
@@ -32,7 +34,7 @@ class FitnessClub(models.Model):
             CheckConstraint(
                 check=Q(date_terminated__gt=F('date_created')),
                 name='check_date_terminated_greater_than_date_created_club',
-                violation_error_message='Date of termination must be greater than date of creation'
+                violation_error_message='Дата закрытия должна быть больше даты открытия'
             ),
         ]
 
@@ -59,7 +61,7 @@ class ClubZone(models.Model):
             CheckConstraint(
                 check=Q(date_terminated__gt=F('date_created')),
                 name='check_date_terminated_greater_than_date_created_zone',
-                violation_error_message='Date of termination must be greater than date of creation'
+                violation_error_message='Дата закрытия должна быть больше даты открытия'
             ),
         ]
 
@@ -87,7 +89,7 @@ class ClubCard(models.Model):
             CheckConstraint(
                 check=Q(date_of_termination__gt=F('date_of_registration')),
                 name='check_date_terminated_greater_than_date_registered',
-                violation_error_message='Date of termination must be greater than date of registration'
+                violation_error_message='Дата окончания действия карты должна быть больше даты начала'
             ),
         ]
 
@@ -142,7 +144,7 @@ class TimeSlot(models.Model):
             CheckConstraint(
                 check=Q(end__gt=F('start')),
                 name='check_end_greater_than_start',
-                violation_error_message='End must be greater than start'
+                violation_error_message='Конец должен быть больше чем начало'
             ),
         ]
 
@@ -155,7 +157,7 @@ class DayType(models.Model):
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
     DAY_TYPE_TITTLES = [('work_day', 'будни'), ('weekend', 'выходной'), ('holiday', 'праздник'), ('special_day',
                                                                                                   'предпраздничный день')]
-    day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, unique=True, verbose_name='Тип дня')
+    day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, verbose_name='Тип дня')
     time_slots = models.ManyToManyField(TimeSlot, blank=True, null=True, verbose_name='Временные слоты')
 
     class Meta:
@@ -164,6 +166,7 @@ class DayType(models.Model):
         managed = True
         db_table = 'day_type'
         ordering = ['day_type_tittle']
+        unique_together = ('fitness_club', 'day_type_tittle')
 
     def __str__(self):
         return f'{self.fitness_club} - {[x[1] for x in DayType.DAY_TYPE_TITTLES if x[0] == self.day_type_tittle][0]}'
@@ -196,7 +199,7 @@ class Schedule(models.Model):
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
     comment = models.CharField(max_length=150, blank=True, null=True, help_text='Введите комфортное число клиентов, '
                                                                                 'тренера', verbose_name='Комментарий')
-    GROUP_STATUS = {'canceled': 'отменено', 'planned': 'планируется'}
+    GROUP_STATUS = [('canceled', 'отменено'), ('planned', 'планируется')]
     group_status = models.CharField(max_length=8, choices=GROUP_STATUS, default='planned', verbose_name='Статус группы')
 
     class Meta:
@@ -205,7 +208,7 @@ class Schedule(models.Model):
         managed = True
         db_table = 'schedule'
         ordering = ['day', 'time_slot', 'group']
-        unique_together = ('group', 'time_slot', 'day')
+        unique_together = ('fitness_club', 'club_zone', 'time_slot', 'day')
 
     def __str__(self):
         start_schedule = f'{self.day} - {self.time_slot.start}'
