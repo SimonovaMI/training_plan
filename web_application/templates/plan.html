@@ -1,3 +1,4 @@
+<! -- Шаблон вывода планируемых посещений клиентов-->
 {% extends "base.html" %}
 {% block content %}
     {% if comment %}
@@ -36,20 +37,22 @@
                                         <button type="submit">Запись</button>
                                     </p>
                                 </form>
-                                <form action="{% url 'plan_info' %}" method="post">>
-                                    {% if user.is_staff %}
-                                        {% csrf_token %}
-                                        <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
-                                               name="is_group_zone"/>
-                                        <input type="hidden" value={{ day }} id="date" name="date"/>
-                                        <input type="hidden" value={{ zone }} id="zone" name="zone"/>
-                                        <input type="hidden" value={{ fitness_club }} id="fitness_club"
-                                               name="fitness_club"/>
-                                        <input type="hidden" value={{ x.time_slot_id }} id="time_slot_id"
-                                               name="time_slot_id"/>
-                                        <button type="submit">Показать</button>
-                                    {% endif %}
-                                </form>
+                                {% if x.clients_count != 0 %}
+                                    <form action="{% url 'plan_info' %}" method="post">>
+                                        {% if user.is_staff %}
+                                            {% csrf_token %}
+                                            <input type="hidden" value={{ is_group_zone }} id="is_group_zone"
+                                                   name="is_group_zone"/>
+                                            <input type="hidden" value={{ day }} id="date" name="date"/>
+                                            <input type="hidden" value={{ zone }} id="zone" name="zone"/>
+                                            <input type="hidden" value={{ fitness_club }} id="fitness_club"
+                                                   name="fitness_club"/>
+                                            <input type="hidden" value={{ x.time_slot_id }} id="time_slot_id"
+                                                   name="time_slot_id"/>
+                                            <button type="submit">Показать</button>
+                                        {% endif %}
+                                    </form>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

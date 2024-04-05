@@ -1,36 +1,41 @@
+<! -- Шаблон отображения планируемых заявок клиента-->
 {% extends "base.html" %}
 {% block content %}
     <h2>Планируемые посещения на {{ date }}</h2>
-    {% if not client_plan %}
-        <p style="color:red;">У Вас не запланировано ни одного посещения на эту дату!</p>
+    {% if message %}
+        <h2>{{ message }}</h2>
     {% else %}
-        <table border='1'>
-            <tr>
-                <th>Начало</th>
-                <th>Конец</th>
-                <th>Зона</th>
-                <th>Фитнес-клуб</th>
-                <th>Действие</th>
-            </tr>
-            {% for x in client_plan %}
+        {% if not client_plan %}
+            <p style="color:red;">У Вас не запланировано ни одного посещения на эту дату!</p>
+        {% else %}
+            <table border='1'>
                 <tr>
-                    <td>{{ x.start_date_time }}</td>
-                    <td>{{ x.end_date_time }}</td>
-                    <td>{{ x.zone }}</td>
-                    <td>{{ x.fitness_club }}</td>
-                    <td>
-                        <form action="{% url 'client_plan_delete' %}" method="post">
-                            <p>
-                                {% csrf_token %}
-                                <input type="hidden" value={{ x.plan_id }} id="plan_ident" name="plan_ident"/>
-                                <input type="hidden" value={{ x.is_group }} id="is_group" name="is_group"/>
-                                <button type="submit">Удалить</button>
-                            </p>
-                        </form>
-                    </td>
-                    >
+                    <th>Начало</th>
+                    <th>Конец</th>
+                    <th>Зона</th>
+                    <th>Фитнес-клуб</th>
+                    <th>Действие</th>
                 </tr>
-            {% endfor %}
-        </table>
+                {% for x in client_plan %}
+                    <tr>
+                        <td>{{ x.start_date_time }}</td>
+                        <td>{{ x.end_date_time }}</td>
+                        <td>{{ x.zone }}</td>
+                        <td>{{ x.fitness_club }}</td>
+                        <td>
+                            <form action="{% url 'client_plan_delete' %}" method="post">
+                                <p>
+                                    {% csrf_token %}
+                                    <input type="hidden" value={{ x.plan_id }} id="plan_ident" name="plan_ident"/>
+                                    <input type="hidden" value={{ x.is_group }} id="is_group" name="is_group"/>
+                                    <button type="submit">Удалить</button>
+                                </p>
+                            </form>
+                        </td>
+                        >
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
     {% endif %}
 {% endblock %}

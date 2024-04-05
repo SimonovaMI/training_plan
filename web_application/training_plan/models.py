@@ -1,4 +1,6 @@
-
+"""
+Описание моделей для взаимодействия с базой данных
+"""
 
 from django.contrib.auth.models import AbstractUser, User
 from django.db import models
@@ -7,6 +9,9 @@ from django.utils import timezone
 
 
 class FitnessClub(models.Model):
+    """
+    Модель фитнес-клуба
+    """
     club_id = models.AutoField(primary_key=True)
     tittle = models.CharField(max_length=255, unique=True, verbose_name='Название клуба')
     post_index = models.CharField(max_length=10, blank=True, null=True, verbose_name='Почтовый индекс')
@@ -40,6 +45,9 @@ class FitnessClub(models.Model):
 
 
 class ClubZone(models.Model):
+    """
+    Модель зон клуба
+    """
     zone_id = models.AutoField(primary_key=True)
     tittle = models.CharField(unique=True, max_length=50, verbose_name='Название зоны фитнес-клуба')
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name='Описание')
@@ -67,6 +75,9 @@ class ClubZone(models.Model):
 
 
 class ClubCard(models.Model):
+    """
+    Модель клубной карты
+    """
     card_id = models.AutoField(primary_key=True)
     number_of_card = models.CharField(max_length=20, verbose_name='Номер карты')
     fitness_club = models.ManyToManyField(FitnessClub, verbose_name='Фитнес-клубы')
@@ -95,6 +106,9 @@ class ClubCard(models.Model):
 
 
 class UserAdditionalInfo(models.Model):
+    """
+    Модель дополнительной информации о клиенте
+    """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birthdate = models.DateField(help_text='Enter the birthdate', verbose_name='Дата рождения')
     phone_number = models.CharField(max_length=12, help_text='Enter the phone number of the client',
@@ -111,6 +125,9 @@ class UserAdditionalInfo(models.Model):
 
 
 class Group(models.Model):
+    """
+    Модель групповых занятий
+    """
     group_id = models.AutoField(primary_key=True)
     tittle = models.CharField(max_length=50, unique=True,
                               verbose_name='Название группы')
@@ -129,6 +146,9 @@ class Group(models.Model):
 
 
 class TimeSlot(models.Model):
+    """
+    Модель временных слотов
+    """
     time_slot_id = models.AutoField(primary_key=True)
     start = models.TimeField(verbose_name='Начало')
     end = models.TimeField(verbose_name='Конец')
@@ -153,10 +173,14 @@ class TimeSlot(models.Model):
 
 
 class DayType(models.Model):
+    """
+    Модель типов дня
+    """
     day_type_id = models.AutoField(primary_key=True)
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
     DAY_TYPE_TITTLES = [('work_day', 'будни'), ('weekend', 'выходной'), ('holiday', 'праздник'), ('special_day',
-                                                                                                  'предпраздничный день')]
+                                                                                                  'предпраздничный '
+                                                                                                  'день')]
     day_type_tittle = models.CharField(max_length=50, choices=DAY_TYPE_TITTLES, verbose_name='Тип дня')
     time_slots = models.ManyToManyField(TimeSlot, blank=True, null=True, verbose_name='Временные слоты')
 
@@ -173,6 +197,9 @@ class DayType(models.Model):
 
 
 class SpecialDay(models.Model):
+    """
+    Модель особых дней
+    """
     special_day_id = models.AutoField(primary_key=True)
     fitness_club = models.ForeignKey(FitnessClub, on_delete=models.CASCADE, verbose_name='Фитнес-клуб')
     day = models.DateField(verbose_name='День')
@@ -191,6 +218,9 @@ class SpecialDay(models.Model):
 
 
 class Schedule(models.Model):
+    """
+    Модель расписаний
+    """
     schedule_id = models.AutoField(primary_key=True)
     day = models.DateField(verbose_name='День')
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, verbose_name='Временной слот')
@@ -216,6 +246,9 @@ class Schedule(models.Model):
 
 
 class Plan(models.Model):
+    """
+    Модель заявок на свободное посещение
+    """
     plan_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Клиент')
     day = models.DateField(default=timezone.now, verbose_name='День')
@@ -237,6 +270,9 @@ class Plan(models.Model):
 
 
 class PlanGroup(models.Model):
+    """
+    Модель заявок на групповое посещение
+    """
     plan_group_id = models.AutoField(primary_key=True)
     client = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Клиент')
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, verbose_name='Расписание')

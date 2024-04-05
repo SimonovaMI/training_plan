@@ -1,6 +1,10 @@
+<! -- Шаблон вывода детальной информации (ФИО, телефон) для менеджера для планирующих посещение-->
 {% extends "base.html" %}
 {% block content %}
     <h2>Планируемые посещения c детализацией посетителей на {{ day }}</h2>
+    {% if message %}
+        <h2>{{ message }}</h2>
+    {% else %}
     {% if clients %}
         <table border='1'>
             <tr>
@@ -14,5 +18,6 @@
                 </tr>
             {% endfor %}
         </table>
+    {% endif %}
     {% endif %}
 {% endblock %}

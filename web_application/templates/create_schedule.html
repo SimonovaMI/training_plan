@@ -1,47 +1,52 @@
+<! -- Шаблон задания параметров нового расписания-->
 {% extends "base.html" %}
 {% block content %}
-    <form action="{% url 'create_schedule_result' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" value={{ day }} id="date" name="date"/>
-        <input type="hidden" value={{ time_slot_id }} id="time_slot_id"
-               name="time_slot_id"/>
+    {% if message %}
+        <h2>{{message}}</h2>
+    {% else %}
+        <form action="{% url 'create_schedule_result' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" value={{ day }} id="date" name="date"/>
+            <input type="hidden" value={{ time_slot_id }} id="time_slot_id"
+                   name="time_slot_id"/>
 
-        <input type="hidden" value={{ fitness_club }} id="fitness_club"
-               name="fitness_club"/>
-        <input type="hidden" value={{ zone }} id="zone" name="zone"/>
-        <p>
-            <label for="select">Группа: </label>
-            <label>
-                <select name="groups">
-                    {% for i in groups %}
-                        <option
-                                value="{{ i.tittle }}">{{ i.tittle }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </label>
-        <p>
-        <p>
-            <label for="select">Статус: </label>
-            <label>
-                <select name="group_status">
-                    {% for i in group_status %}
-                        <option
-                                {% if i == 'планируется' %}
-                                    selected="selected"
-                                {% endif %}
-                                value="{{ i }}">{{ i }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </label>
-        <p>
-            <label for="comment">Комментарий: </label>
-        </p>
-        <textarea id="comment" name="comment" rows="5" cols="50" maxlength="150">
+            <input type="hidden" value={{ fitness_club }} id="fitness_club"
+                   name="fitness_club"/>
+            <input type="hidden" value={{ zone }} id="zone" name="zone"/>
+            <p>
+                <label for="select">Группа: </label>
+                <label>
+                    <select name="groups">
+                        {% for i in groups %}
+                            <option
+                                    value="{{ i.tittle }}">{{ i.tittle }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+            <p>
+            <p>
+                <label for="select">Статус: </label>
+                <label>
+                    <select name="group_status">
+                        {% for i in group_status %}
+                            <option
+                                    {% if i == 'планируется' %}
+                                        selected="selected"
+                                    {% endif %}
+                                        value="{{ i }}">{{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+            <p>
+                <label for="comment">Комментарий: </label>
+            </p>
+            <textarea id="comment" name="comment" rows="5" cols="50" maxlength="150">
         </textarea>
-        <p>
-            <button type="submit">Создать</button>
-        </p>
-    </form>>
+            <p>
+                <button type="submit">Создать</button>
+            </p>
+        </form>
+    {% endif %}
 {% endblock %}

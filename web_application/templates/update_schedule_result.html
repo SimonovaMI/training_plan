@@ -1,4 +1,9 @@
+<! -- Шаблон результата изменения расписания-->
 {% extends "base.html" %}
 {% block content %}
+    {% if message %}
+        <h2>{{ message }}</h2>
+    {% else %}
     <h2>Расписание успешно изменено!</h2>
+    {% endif %}
 {% endblock %}

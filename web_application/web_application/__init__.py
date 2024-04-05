@@ -1,2 +1,2 @@
-mysql_user = 'user'
-mysql_password = 'password'
+mysql_user = 'root'
+mysql_password = '@30041992Omi177'

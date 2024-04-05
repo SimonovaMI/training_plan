@@ -1,17 +1,25 @@
+"""
+Настройка административного доступа
+"""
 from django.contrib import admin
-from .models import (FitnessClub, ClubZone, ClubCard, UserAdditionalInfo, Group, Schedule, Plan, PlanGroup, TimeSlot,
+from .models import (FitnessClub, ClubZone, ClubCard, UserAdditionalInfo, Group, Schedule, TimeSlot,
                      DayType, SpecialDay)
-
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 
 
 class UserAdditionalInfoInline(admin.StackedInline):
+    """
+    Добавление к описанию пользователя дополнительной информации
+    """
     model = UserAdditionalInfo
     can_delete = False
 
 
 class CustomizedUserAdmin(UserAdmin):
+    """
+    Добавление к описанию пользователя дополнительной информации для заполнения
+    """
     inlines = (UserAdditionalInfoInline,)
 
 
@@ -25,4 +33,3 @@ admin.site.register(TimeSlot)
 admin.site.register(DayType)
 admin.site.register(SpecialDay)
 admin.site.register(Schedule)
-
